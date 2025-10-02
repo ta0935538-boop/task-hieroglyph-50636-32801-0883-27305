@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Save, FolderOpen, Copy, Trash2, Eye, EyeOff, Settings, Sparkles, FileText } from 'lucide-react';
+import { Plus, Save, FolderOpen, Copy, Trash2, Eye, EyeOff, Settings, Sparkles, FileText, CheckSquare, X } from 'lucide-react';
 import { Todo, ContextMenuPosition, Workspace, SavedTask } from '@/types/todo';
 import TodoItem from './TodoItem';
 import ContextMenu from './ContextMenu';
@@ -39,6 +39,7 @@ const TodoList = () => {
   const [globalLineHeight, setGlobalLineHeight] = useState(1.8);
   const [showHeader, setShowHeader] = useState(true);
   const [showToolbar, setShowToolbar] = useState(true);
+  const [selectedTodos, setSelectedTodos] = useState<string[]>([]);
 
   // Load from localStorage
   useEffect(() => {
@@ -212,6 +213,46 @@ const TodoList = () => {
 
     navigator.clipboard.writeText(text);
     toast.success('تم نسخ المهام غير المكتملة');
+  };
+
+  const copySelectedTasks = () => {
+    if (selectedTodos.length === 0) {
+      toast.error('لم يتم تحديد أي مهام');
+      return;
+    }
+
+    const text = todos
+      .filter(todo => selectedTodos.includes(todo.id) && !todo.parentId)
+      .map(todo => {
+        const subTasks = todos.filter(t => t.parentId === todo.id && selectedTodos.includes(t.id));
+        let result = `○ ${todo.text}`;
+        subTasks.forEach(sub => {
+          result += `\n  ○ ${sub.text}`;
+        });
+        return result;
+      })
+      .join('\n');
+
+    navigator.clipboard.writeText(text);
+    toast.success(`تم نسخ ${selectedTodos.length} مهمة`);
+    setSelectedTodos([]);
+  };
+
+  const toggleSelectTodo = (id: string) => {
+    setSelectedTodos(prev => 
+      prev.includes(id) ? prev.filter(tid => tid !== id) : [...prev, id]
+    );
+  };
+
+  const selectAllTodos = () => {
+    const allIds = todos.map(t => t.id);
+    setSelectedTodos(allIds);
+    toast.success('تم تحديد جميع المهام');
+  };
+
+  const clearSelection = () => {
+    setSelectedTodos([]);
+    toast.info('تم إلغاء التحديد');
   };
 
 
@@ -526,8 +567,28 @@ const TodoList = () => {
         {/* Header */}
         {showHeader && (
           <div className="mb-8 text-center relative">
-            <div className="absolute left-4 top-0">
+            <div className="absolute left-4 top-0 flex gap-2">
               <ThemeToggle />
+              {selectedTodos.length > 0 && (
+                <>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={copySelectedTasks}
+                    className="gap-2"
+                  >
+                    <Copy className="w-4 h-4" />
+                    نسخ المحدد ({selectedTodos.length})
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearSelection}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </>
+              )}
             </div>
             <h1 className="text-5xl font-bold mb-3 gradient-primary bg-clip-text text-transparent animate-fade-in">
               قائمة المهام الذكية
@@ -866,6 +927,8 @@ const TodoList = () => {
                                 globalPromptMode={globalPromptMode}
                                 globalFontSize={globalFontSize}
                                 globalLineHeight={globalLineHeight}
+                                isSelected={selectedTodos.includes(todo.id)}
+                                onToggleSelect={toggleSelectTodo}
                               />
                             </div>
                           )}
@@ -900,6 +963,8 @@ const TodoList = () => {
                                           globalPromptMode={globalPromptMode}
                                           globalFontSize={globalFontSize}
                                           globalLineHeight={globalLineHeight}
+                                          isSelected={selectedTodos.includes(subTodo.id)}
+                                          onToggleSelect={toggleSelectTodo}
                                         />
                                       </div>
                                     )}
@@ -950,12 +1015,16 @@ const TodoList = () => {
           isSubTask={!!contextMenu.todo?.parentId}
           onShowStatistics={() => setShowStatistics(true)}
           onCopyAllTasks={copyAllTasks}
+          onCopySelectedTasks={copySelectedTasks}
+          onSelectAllTasks={selectAllTodos}
+          onClearSelection={clearSelection}
           onToggleToolbar={() => setShowToolbar(!showToolbar)}
           onToggleHeader={() => setShowHeader(!showHeader)}
           onExportDatabase={exportDatabase}
           onImportDatabase={importDatabase}
           showToolbar={showToolbar}
           showHeader={showHeader}
+          hasSelectedTasks={selectedTodos.length > 0}
         />
       )}
     </div>

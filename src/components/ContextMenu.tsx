@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Plus, Edit3, Trash2, Copy, Clipboard, ListTree, BarChart3, FileUp, FileDown, Eye, EyeOff, Settings as SettingsIcon } from 'lucide-react';
+import { Plus, Edit3, Trash2, Copy, Clipboard, ListTree, BarChart3, FileUp, FileDown, Eye, EyeOff, Settings as SettingsIcon, CheckSquare, Square } from 'lucide-react';
 import { ContextMenuPosition } from '@/types/todo';
 
 interface ContextMenuProps {
@@ -15,12 +15,16 @@ interface ContextMenuProps {
   isSubTask: boolean;
   onShowStatistics?: () => void;
   onCopyAllTasks?: () => void;
+  onCopySelectedTasks?: () => void;
+  onSelectAllTasks?: () => void;
+  onClearSelection?: () => void;
   onToggleToolbar?: () => void;
   onToggleHeader?: () => void;
   onExportDatabase?: () => void;
   onImportDatabase?: () => void;
   showToolbar?: boolean;
   showHeader?: boolean;
+  hasSelectedTasks?: boolean;
 }
 
 const ContextMenu = ({
@@ -36,12 +40,16 @@ const ContextMenu = ({
   isSubTask,
   onShowStatistics,
   onCopyAllTasks,
+  onCopySelectedTasks,
+  onSelectAllTasks,
+  onClearSelection,
   onToggleToolbar,
   onToggleHeader,
   onExportDatabase,
   onImportDatabase,
   showToolbar,
   showHeader,
+  hasSelectedTasks,
 }: ContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -74,9 +82,13 @@ const ContextMenu = ({
     { icon: Copy, label: 'نسخ', action: onCopy, show: true },
     { icon: Clipboard, label: 'لصق', action: onPaste, show: hasCopiedTask },
     { icon: Trash2, label: 'حذف', action: onDelete, show: true, danger: true },
-    { type: 'divider', show: onShowStatistics || onCopyAllTasks || onToggleToolbar },
+    { type: 'divider', show: onShowStatistics || onCopyAllTasks || onSelectAllTasks },
     { icon: BarChart3, label: 'الإحصائيات', action: onShowStatistics, show: !!onShowStatistics },
-    { icon: Copy, label: 'نسخ جميع المهام', action: onCopyAllTasks, show: !!onCopyAllTasks },
+    { icon: Copy, label: 'نسخ جميع المهام', action: onCopyAllTasks, show: !!onCopyAllTasks, shortcut: 'Ctrl+C' },
+    { icon: CheckSquare, label: 'تحديد جميع المهام', action: onSelectAllTasks, show: !!onSelectAllTasks },
+    { icon: Copy, label: 'نسخ المهام المحددة', action: onCopySelectedTasks, show: !!onCopySelectedTasks && hasSelectedTasks },
+    { icon: Square, label: 'إلغاء التحديد', action: onClearSelection, show: !!onClearSelection && hasSelectedTasks },
+    { type: 'divider', show: onToggleToolbar || onToggleHeader },
     { icon: showToolbar ? EyeOff : Eye, label: showToolbar ? 'إخفاء شريط الأدوات' : 'إظهار شريط الأدوات', action: onToggleToolbar, show: !!onToggleToolbar },
     { icon: showHeader ? EyeOff : Eye, label: showHeader ? 'إخفاء الهيدر' : 'إظهار الهيدر', action: onToggleHeader, show: !!onToggleHeader },
     { type: 'divider', show: onExportDatabase || onImportDatabase },
@@ -114,6 +126,9 @@ const ContextMenu = ({
           >
             <Icon className="w-4 h-4" />
             <span className="text-sm font-medium">{item.label}</span>
+            {item.shortcut && (
+              <span className="mr-auto text-xs text-muted-foreground">{item.shortcut}</span>
+            )}
           </button>
         );
       })}

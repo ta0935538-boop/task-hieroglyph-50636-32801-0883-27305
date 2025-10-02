@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Check, GripVertical, Sparkles, Mic, MicOff, Wand2, Copy, ZoomIn, ZoomOut, Trash2 } from 'lucide-react';
+import { Check, GripVertical, Sparkles, Mic, MicOff, Wand2, Copy, ZoomIn, ZoomOut, Trash2, Square } from 'lucide-react';
 import { Todo } from '@/types/todo';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
@@ -29,6 +29,8 @@ interface TodoItemProps {
   globalPromptMode?: 'full-code' | 'code-changes' | 'notes';
   globalFontSize?: number;
   globalLineHeight?: number;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 const TodoItem = ({
@@ -48,6 +50,8 @@ const TodoItem = ({
   globalPromptMode = 'full-code',
   globalFontSize = 14,
   globalLineHeight = 1.8,
+  isSelected = false,
+  onToggleSelect,
 }: TodoItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
@@ -156,11 +160,19 @@ const TodoItem = ({
     >
       <div className={`bg-card rounded-2xl border-2 border-border p-6 transition-smooth hover:shadow-xl hover:border-primary/50 ${
         todo.completed ? 'opacity-60 bg-success/5 border-success/20' : ''
-      } ${isDragging ? 'shadow-2xl scale-105' : ''}`}>
+      } ${isDragging ? 'shadow-2xl scale-105' : ''} ${isSelected ? 'ring-2 ring-primary border-primary' : ''}`}>
         <div className="flex items-start gap-3">
           <div {...dragHandleProps}>
             <GripVertical className="w-5 h-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-smooth cursor-grab active:cursor-grabbing" />
           </div>
+
+          {onToggleSelect && (
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onToggleSelect(todo.id)}
+              className="mt-1"
+            />
+          )}
           
           <Checkbox
             checked={todo.completed}
