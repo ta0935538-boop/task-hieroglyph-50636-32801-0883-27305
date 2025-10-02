@@ -6,6 +6,7 @@ import ContextMenu from './ContextMenu';
 import ProgressBar from './ProgressBar';
 import Statistics from './Statistics';
 import SavedTasksManager from './SavedTasksManager';
+import ThemeToggle from './ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -524,7 +525,10 @@ const TodoList = () => {
       <div className="container max-w-6xl mx-auto py-8 px-4">
         {/* Header */}
         {showHeader && (
-          <div className="mb-8 text-center">
+          <div className="mb-8 text-center relative">
+            <div className="absolute left-4 top-0">
+              <ThemeToggle />
+            </div>
             <h1 className="text-5xl font-bold mb-3 gradient-primary bg-clip-text text-transparent animate-fade-in">
               قائمة المهام الذكية
             </h1>
