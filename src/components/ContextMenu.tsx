@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Plus, Edit3, Trash2, Copy, Clipboard, ListTree } from 'lucide-react';
+import { Plus, Edit3, Trash2, Copy, Clipboard, ListTree, BarChart3, FileUp, FileDown, Eye, EyeOff, Settings as SettingsIcon } from 'lucide-react';
 import { ContextMenuPosition } from '@/types/todo';
 
 interface ContextMenuProps {
@@ -13,6 +13,14 @@ interface ContextMenuProps {
   onPaste: () => void;
   hasCopiedTask: boolean;
   isSubTask: boolean;
+  onShowStatistics?: () => void;
+  onCopyAllTasks?: () => void;
+  onToggleToolbar?: () => void;
+  onToggleHeader?: () => void;
+  onExportDatabase?: () => void;
+  onImportDatabase?: () => void;
+  showToolbar?: boolean;
+  showHeader?: boolean;
 }
 
 const ContextMenu = ({
@@ -26,6 +34,14 @@ const ContextMenu = ({
   onPaste,
   hasCopiedTask,
   isSubTask,
+  onShowStatistics,
+  onCopyAllTasks,
+  onToggleToolbar,
+  onToggleHeader,
+  onExportDatabase,
+  onImportDatabase,
+  showToolbar,
+  showHeader,
 }: ContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -58,6 +74,14 @@ const ContextMenu = ({
     { icon: Copy, label: 'نسخ', action: onCopy, show: true },
     { icon: Clipboard, label: 'لصق', action: onPaste, show: hasCopiedTask },
     { icon: Trash2, label: 'حذف', action: onDelete, show: true, danger: true },
+    { type: 'divider', show: onShowStatistics || onCopyAllTasks || onToggleToolbar },
+    { icon: BarChart3, label: 'الإحصائيات', action: onShowStatistics, show: !!onShowStatistics },
+    { icon: Copy, label: 'نسخ جميع المهام', action: onCopyAllTasks, show: !!onCopyAllTasks },
+    { icon: showToolbar ? EyeOff : Eye, label: showToolbar ? 'إخفاء شريط الأدوات' : 'إظهار شريط الأدوات', action: onToggleToolbar, show: !!onToggleToolbar },
+    { icon: showHeader ? EyeOff : Eye, label: showHeader ? 'إخفاء الهيدر' : 'إظهار الهيدر', action: onToggleHeader, show: !!onToggleHeader },
+    { type: 'divider', show: onExportDatabase || onImportDatabase },
+    { icon: FileUp, label: 'تصدير قاعدة البيانات', action: onExportDatabase, show: !!onExportDatabase },
+    { icon: FileDown, label: 'استيراد قاعدة البيانات', action: onImportDatabase, show: !!onImportDatabase },
   ];
 
   return (
@@ -71,6 +95,11 @@ const ContextMenu = ({
     >
       {menuItems.map((item, index) => {
         if (!item.show) return null;
+        
+        if (item.type === 'divider') {
+          return <div key={index} className="my-1 border-t border-border" />;
+        }
+        
         const Icon = item.icon;
         return (
           <button

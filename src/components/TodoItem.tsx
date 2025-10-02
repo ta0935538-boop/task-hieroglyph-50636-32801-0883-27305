@@ -167,18 +167,6 @@ const TodoItem = ({
             onCheckedChange={() => onToggle(todo.id)}
             className="mt-1"
           />
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(todo.id);
-            }}
-            className="opacity-0 group-hover:opacity-100 transition-smooth text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
 
           {isEditing && !showTextOnly ? (
             <div className="flex-1 space-y-3">
@@ -322,6 +310,18 @@ const TodoItem = ({
               </div>
             </div>
           )}
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(todo.id);
+            }}
+            className="opacity-0 group-hover:opacity-100 transition-smooth text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0 mr-auto"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
       </div>
     </div>

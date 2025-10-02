@@ -937,13 +937,21 @@ const TodoList = () => {
           position={contextMenu.position}
           onClose={() => setContextMenu(null)}
           onAddTask={() => addTodo('مهمة جديدة')}
-          onAddSubTask={contextMenu.todo ? () => addTodo('مهمة فرعية', contextMenu.todo!.id) : undefined}
+          onAddSubTask={contextMenu.todo && !contextMenu.todo.parentId ? () => addTodo('مهمة فرعية', contextMenu.todo!.id) : undefined}
           onEdit={() => {}}
           onDelete={() => contextMenu.todo && deleteTodo(contextMenu.todo.id)}
           onCopy={() => contextMenu.todo && copyTodo(contextMenu.todo)}
           onPaste={() => pasteTodo(contextMenu.todo?.id || null)}
           hasCopiedTask={!!copiedTodo}
           isSubTask={!!contextMenu.todo?.parentId}
+          onShowStatistics={() => setShowStatistics(true)}
+          onCopyAllTasks={copyAllTasks}
+          onToggleToolbar={() => setShowToolbar(!showToolbar)}
+          onToggleHeader={() => setShowHeader(!showHeader)}
+          onExportDatabase={exportDatabase}
+          onImportDatabase={importDatabase}
+          showToolbar={showToolbar}
+          showHeader={showHeader}
         />
       )}
     </div>
