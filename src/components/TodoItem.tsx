@@ -170,7 +170,7 @@ const TodoItem = ({
             <Checkbox
               checked={isSelected}
               onCheckedChange={() => onToggleSelect(todo.id)}
-              className="mt-1"
+              className="mt-1 border-accent data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground focus-visible:ring-accent"
             />
           )}
           
